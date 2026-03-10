@@ -1,0 +1,59 @@
+# 顶级配置，必须放在文件最开头
+root = true
+
+# 对所有文件生效
+[*]
+# 字符集
+charset = utf-8
+# 缩进风格：使用空格
+indent_style = space
+# 缩进大小：4个空格
+indent_size = 4
+# 换行符风格
+end_of_line = lf
+# 文件末尾保留一个空行
+insert_final_newline = true
+# 删除行尾多余的空格
+trim_trailing_whitespace = true
+
+# 针对所有SQL文件的具体配置
+[*.sql]
+# 设置SQL的代码样式
+# 这些是IntelliJ平台（DataGrip基于此）特有的配置项
+
+#### 1. 大小写 (对应习惯1: 关键字大写，标识符小写) ####
+# 关键字: UPPERCASE
+ij_sql_keyword_case = UPPERCASE
+# 标识符: lowercase (如果不生效，可以尝试保持原样或在IDE中调整)
+# DataGrip中标识符大小写通常通过编辑器视觉呈现，而非强制改写文本。
+# 此配置主要影响自动格式化。
+
+#### 2. 缩进与换行 (对应习惯3, 8, 12) ####
+# 设置子句（SELECT, FROM, WHERE等）的换行和对齐
+ij_sql_clause_wrap = nl_each
+# 设置逗号前置 (对应习惯3)
+ij_sql_comma_position = beginning
+
+# 设置JOIN子句换行
+ij_sql_join_wrap = nl_each
+
+#### 3. 括号与列表 (对应习惯3) ####
+# 设置括号内元素的换行
+ij_sql_parentheses_wrap = if_long
+# 设置括号内逗号后加空格 (对应习惯9)
+ij_sql_space_within_parentheses = true
+
+#### 4. 空格 (对应习惯9) ####
+# 在二元操作符（=, >, AND等）前后添加空格
+ij_sql_space_before_binary_operator = true
+ij_sql_space_after_binary_operator = true
+
+#### 5. 其他格式 (对应习惯8) ####
+# 确保每个语句以新行开始
+ij_sql_statement_wrap = nl_each
+
+#### 6. 通用IntelliJ配置 (对应习惯3) ####
+# 设置视觉参考线，例如在120个字符处
+ij_any_visual_guides = 120
+# 设置硬换行列数
+ij_any_hard_wrap_at = 120
