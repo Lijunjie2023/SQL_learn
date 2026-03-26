@@ -80,8 +80,61 @@ SELECT DISTINCT user_id, login_date
 FROM user_login
 ORDER BY login_date;
 
-# WITH distinct_logins AS (SELECT DISTINCT user_id, login_date
-#                          FROM user_login
-#                          ORDER BY login_date),
-#      ranked AS (SELECT user_id,login_date
-#                 FROM distinct_logins)
+-- 断断续续写出来，问题一大堆，感觉有点乱
+WITH distinct_logins AS (SELECT DISTINCT user_id,
+                                         login_date
+                         FROM user_login
+                         ORDER BY login_date),
+     ranked AS (SELECT user_id,
+                       login_date,
+                       ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY login_date) AS rn
+                FROM distinct_logins),
+     groups_day AS (SELECT user_id,
+                           login_date,
+                           (login_date - rn) AS continu
+                    FROM ranked),
+     continu_days AS (SELECT user_id,
+                             continu,
+                             MIN(login_date) AS start_login,
+                             MAX(login_date) AS end_login,
+                             COUNT(*)        AS days_count
+                      FROM groups_day
+                      GROUP BY user_id, continu)
+SELECT user_id,
+       start_login,
+       end_login,
+       days_count
+FROM continu_days
+WHERE days_count >= 3;
+
+
+# 新思路：更清晰
+# 为每个用户按登录日期排序，得到序号rn。
+# 计算日期减去rn的天数，得到组标识（因为连续日期减去相同的rn会得到相同的日期）。注意：这里日期减整数，数据库函数需用date_sub或类似。
+# 按用户和组标识分组，统计每组记录数（连续天数），筛选出天数>=3的组。
+# 对于每个用户，可能有多个这样的组，需要找出最小的开始日期。开始日期就是该组的最小登录日期。
+# 最后输出用户ID和开始日期。
+
+WITH login_with_rn AS (SELECT user_id,
+                              login_date,
+                              ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY login_date) AS rn
+                       FROM user_login),
+     groups_days AS (SELECT user_id,
+                            login_date,
+                            DATE_SUB(login_date, INTERVAL rn DAY) AS group_date
+                     FROM login_with_rn),
+     continuous_days AS (SELECT user_id,
+                                MIN(login_date)   AS start_login,
+                                COUNT(group_date) AS days_count
+                         FROM groups_days
+                         GROUP BY user_id, group_date
+                         HAVING days_count >= 3),
+     first_continuous AS (SELECT user_id,
+                                 start_login,
+                                 days_count,
+                                 ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY start_login) AS rn2
+                          FROM continuous_days)
+SELECT user_id, start_login, days_count
+FROM first_continuous
+WHERE rn2 = 1
+ORDER BY user_id;
