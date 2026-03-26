@@ -78,6 +78,7 @@ VALUES
 
 SELECT DISTINCT user_id, login_date
 FROM user_login
+<<<<<<< HEAD
 ORDER BY login_date;
 
 -- 断断续续写出来，问题一大堆，感觉有点乱
@@ -138,3 +139,6 @@ SELECT user_id, start_login, days_count
 FROM first_continuous
 WHERE rn2 = 1
 ORDER BY user_id;
+=======
+ORDER BY login_date;
+>>>>>>> a9016e49f9f8cd28ca19f638337922b852a0b719
