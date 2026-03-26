@@ -79,9 +79,3 @@ VALUES
 SELECT DISTINCT user_id, login_date
 FROM user_login
 ORDER BY login_date;
-
-# WITH distinct_logins AS (SELECT DISTINCT user_id, login_date
-#                          FROM user_login
-#                          ORDER BY login_date),
-#      ranked AS (SELECT user_id,login_date
-#                 FROM distinct_logins)
